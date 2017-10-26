@@ -23,7 +23,5 @@ build cc_preexp.json: cdb
 build compile_commands.json: cdb_e cc_preexp.json
 build cscope.files: cscf
 build cscope.in.out cscope.po.out cscope.out: cscdb cscope.files
-build ./etree.o: cxx ./etree.cpp
-build ./main.o: cxx ./main.cpp
-build main.elf: cl ./etree.o ./main.o
+build main.elf: cl
 build main.bin: ocb main.elf

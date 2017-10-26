@@ -1,5 +1,5 @@
-CC=clan$(CC)
-FLAGS=-Wall -g -Wc++11-extensions -std=c++11
+CC=g++ #clan$(CC)
+FLAGS=-Wall -g -std=c++11
 
 # RUN
 build: expression.o main.o var.o
