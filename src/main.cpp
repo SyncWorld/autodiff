@@ -20,7 +20,7 @@ M load_csv (const std::string & path, bool verbose = false) {
         while (std::getline(lineStream, cell, ',')) {
             if(verbose)
                 std::cout << cell << std::endl;
-            
+
             double val = std::stod(cell);
             values.push_back(val);
         }
@@ -34,7 +34,7 @@ M load_csv (const std::string & path, bool verbose = false) {
 MatrixXd one_hot(const MatrixXd& m){
     int max_num = 0;
     for(int i = 0; i < m.rows(); i++){
-       max_num = std::max(double(max_num), double(m(i,0))); 
+       max_num = std::max(double(max_num), double(m(i,0)));
     }
     MatrixXd onehot = MatrixXd::Zero(m.rows(), max_num+1);
     for(int i = 0; i < m.rows(); i++){
@@ -53,11 +53,11 @@ int main(){
     const int iterations = 10000;
     MatrixXd A = load_csv<MatrixXd>("iris.csv");
 
-    var X(A.leftCols(4)), 
-        y(one_hot(A.rightCols(1))), 
+    var X(A.leftCols(4)),
+        y(one_hot(A.rightCols(1))),
         w1(MatrixXd::Random(4,10)*scale_init),
         w2(MatrixXd::Random(10,3)*scale_init);
-    
+
     std::cout << "X : " << X.getValue() << std::endl;
     std::cout << "y : " << y.getValue() << std::endl;
     std::cout << "w1 : " << w1.getValue() << std::endl;
@@ -86,14 +86,14 @@ int main(){
         w2.setValue( w2.getValue().array() - learning_rate * m[w2].array() );
     }
     // TIMING END
-    
+
     auto end = std::chrono::steady_clock::now();
     auto diff = end - start;
-    
+
     MatrixXd ans(y.getValue().rows(), 6);
     ans.leftCols(3) << y.getValue();
     ans.rightCols(3) << sigm2.getValue();
     std::cout << "PREDICTION : " << ans << std::endl;
-    std::cout << "Time elapsed : " << 
+    std::cout << "Time elapsed : " <<
         std::chrono::duration <double, std::milli> (diff).count() << " ms" << std::endl;
 }
