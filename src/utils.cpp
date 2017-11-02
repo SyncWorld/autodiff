@@ -10,13 +10,13 @@ MatrixXd eval(var& root, bool iter){
         return exp.propagate();
 }
 
-void back(const var& root, 
+void back(const var& root,
         std::unordered_map<var, MatrixXd>& derivative){
     expression exp(root);
     exp.backpropagate(derivative);
 }
 
-void back(expression& exp, 
+void back(expression& exp,
         std::unordered_map<var, MatrixXd>& derivative,
         const std::unordered_set<var>& leaves)
 {

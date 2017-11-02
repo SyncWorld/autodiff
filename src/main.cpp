@@ -96,4 +96,6 @@ int main(){
     std::cout << "PREDICTION : " << ans << std::endl;
     std::cout << "Time elapsed : " <<
         std::chrono::duration <double, std::milli> (diff).count() << " ms" << std::endl;
+
+    return 0;
 }

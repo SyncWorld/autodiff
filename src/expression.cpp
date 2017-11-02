@@ -67,19 +67,19 @@ MatrixXd _eval(op_type op, const std::vector<var>& operands){
         case op_type::none:{
             throw std::invalid_argument("Cannot have a non-leaf contain none-op.");
         }
-    }; 
+    };
 }
 
 // Helper function for recursive backpropagation
-MatrixXd _back_single(op_type op, 
+MatrixXd _back_single(op_type op,
         const MatrixXd& dx,
         const std::vector<var>& operands,
         int op_idx){
     switch(op){
         case op_type::plus: {
-            if(!is_scalar(operands[op_idx])) 
+            if(!is_scalar(operands[op_idx]))
                 return dx;
-            else 
+            else
                 return scalar(dx.array().sum());
         }
         case op_type::minus: {
@@ -90,12 +90,12 @@ MatrixXd _back_single(op_type op,
                 return -1 * res.array();
         }
         case op_type::multiply: {
-            if(is_scalar(operands[op_idx])) 
+            if(is_scalar(operands[op_idx]))
                 return scalar((dx.array() * mval(operands[1-op_idx]).array()).sum());
             else if(is_scalar(operands[1-op_idx]))
                 return dx.array() * sval(operands[1-op_idx]);
-            else 
-                return dx.array() * 
+            else
+                return dx.array() *
                     mval(operands[(1-op_idx)]).array();
         }
         case op_type::divide: {
@@ -105,36 +105,36 @@ MatrixXd _back_single(op_type op,
                 else if(is_scalar(operands[1]))
                     return dx.array() * (1 / sval(operands[1]));
                 else
-                    return dx.array() * 
+                    return dx.array() *
                         (1 / mval(operands[1]).array());
             }
             else{
                 if(is_scalar(operands[1]))
-                    return scalar((dx.array() * 
-                            (-mval(operands[0]).array() / 
+                    return scalar((dx.array() *
+                            (-mval(operands[0]).array() /
                              std::pow(sval(operands[1]),2))).sum());
                 else if(is_scalar(operands[0]))
-                    return dx.array() * (-sval(operands[0]) / 
+                    return dx.array() * (-sval(operands[0]) /
                         mval(operands[1]).array().pow(2));
                 else
-                    return dx.array() * 
-                        (-mval(operands[0]).array() / 
+                    return dx.array() *
+                        (-mval(operands[0]).array() /
                          mval(operands[1]).array().pow(2));
             }
         }
         case op_type::exponent: {
-            return dx.array() * 
+            return dx.array() *
                 mval(operands[0]).array().exp();
 
         }
         case op_type::log: {
-            return dx.array() * 
+            return dx.array() *
                 (1 / mval(operands[0]).array());
         }
         case op_type::polynomial: {
             if(op_idx == 0)
-                return dx.array() * 
-                    mval(operands[0]).array().pow(sval(operands[1])-1) * 
+                return dx.array() *
+                    mval(operands[0]).array().pow(sval(operands[1])-1) *
                         sval(operands[1]);
             else
                 return scalar(0); // we don't support exponents other than e.
@@ -164,7 +164,7 @@ MatrixXd _back_single(op_type op,
         case op_type::none: {
             throw std::invalid_argument("Cannot have a non-leaf contain none-op.");
         }
-    }; 
+    };
 }
 
 std::vector<MatrixXd> _back(op_type op, const std::vector<var>& operands,
@@ -220,7 +220,7 @@ std::vector<var> expression::findLeaves(){
 void _rpropagate(var& v){
     if(v.getChildren().empty())
         return;
-    std::vector<var> children = v.getChildren(); 
+    std::vector<var> children = v.getChildren();
     for(var& _v : children){
         _rpropagate(_v);
     }
@@ -247,12 +247,12 @@ MatrixXd expression::propagate(){
 //         m[parent]++
 //         if m[parent] has sufficient nums:
 //             q.add(parent)
-//     
+//
 // return root.val
 
 MatrixXd expression::propagate(const std::vector<var>& leaves){
     std::queue<var> q;
-    std::unordered_map<var, int> explored; 
+    std::unordered_map<var, int> explored;
     for(const var& v : leaves){
         q.push(v);
     }
@@ -261,30 +261,30 @@ MatrixXd expression::propagate(const std::vector<var>& leaves){
         q.pop();
         std::vector<var> parents = v.getParents();
         for(var& parent : parents){
-            explored[parent]++; 
+            explored[parent]++;
             if(numOpArgs(parent.getOp()) == explored[parent]){
                 parent.setValue(_eval(parent.getOp(), parent.getChildren()));
                 q.push(parent);
             }
-        } 
-    } 
+        }
+    }
     return root.getValue();
 }
 
 std::unordered_set<var> expression::findNonConsts(const std::vector<var>& leaves){
     std::unordered_set<var> nonconsts;
-    std::queue<var> q; 
+    std::queue<var> q;
     for(const var& v : leaves)
-        q.push(v); 
+        q.push(v);
 
     while(!q.empty()){
         var v = q.front();
         q.pop();
-        
+
         // We should not traverse this if it has already been visited.
         if(nonconsts.find(v) != nonconsts.end())
             continue;
-        
+
         nonconsts.insert(v);
         std::vector<var> parents = v.getParents();
         for(const var& parent : parents){
@@ -310,7 +310,7 @@ void expression::backpropagate(std::unordered_map<var, MatrixXd>& leaves){
     std::unordered_map<var, int> explored;
     q.push(root);
     derivatives[root] = ones_like(root);
-    
+
     while(!q.empty()){
         var v = q.front();
         q.pop();
@@ -326,27 +326,27 @@ void expression::backpropagate(std::unordered_map<var, MatrixXd>& leaves){
                 derivatives.emplace(child, zeros_like(child));
             derivatives[child] = derivatives[child].array() + child_derivs[i].array();
             if(children[i].getOp() != op_type::none && explored[child] == 0)
-                q.push(child); 
+                q.push(child);
         }
     }
-   
+
     // After we have retrieved the derivatives,
     // select the leaves and update in leaves.
     for(auto& iter : leaves){
-        iter.second = derivatives[iter.first]; 
-    } 
+        iter.second = derivatives[iter.first];
+    }
 }
 
 // Restricted BFS: same as previous, but we will have a set of nonconsts to tell us
 // where we can BFS to.
-void expression::backpropagate(std::unordered_map<var, MatrixXd>& leaves, 
+void expression::backpropagate(std::unordered_map<var, MatrixXd>& leaves,
         const std::unordered_set<var>& nonconsts){
     std::queue<var> q;
     std::unordered_map<var, MatrixXd> derivatives;
     std::unordered_map<var, int> explored;
     q.push(root);
     derivatives[root] = ones_like(root);
-    
+
     while(!q.empty()){
         var v = q.front();
         q.pop();
@@ -364,15 +364,15 @@ void expression::backpropagate(std::unordered_map<var, MatrixXd>& leaves,
                 derivatives.emplace(child, zeros_like(child));
             derivatives[child] = derivatives[child].array() + child_derivs[i].array();
             if(children[i].getOp() != op_type::none && explored[child] == 0)
-                q.push(child); 
+                q.push(child);
         }
     }
-   
+
     // After we have retrieved the derivatives,
     // select the leaves and update in leaves.
     for(auto& iter : leaves){
-        iter.second = derivatives[iter.first]; 
-    } 
+        iter.second = derivatives[iter.first];
+    }
 }
 
 }

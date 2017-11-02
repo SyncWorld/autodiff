@@ -56,16 +56,16 @@ var::var(const var&) = default;
 var& var::operator=(const var&) = default;
 // deep copyable
 var var::clone(){
-    return var(std::make_shared<impl>(*pimpl)); 
+    return var(std::make_shared<impl>(*pimpl));
 }
 
 /* et::var funcs: */
 var::var(std::shared_ptr<impl> _pimpl) : pimpl(_pimpl){};
 
-var::var(const MatrixXd& _val) 
+var::var(const MatrixXd& _val)
 : pimpl(new impl(_val)){}
 
-var::var(double _val) 
+var::var(double _val)
 : pimpl(new impl(scalar(_val))){}
 
 var::var(op_type _op, const std::vector<var>& _children)
@@ -86,7 +86,7 @@ std::vector<var> var::getParents() const{
     std::vector<var> _parents;
     for( std::weak_ptr<impl> parent : pimpl->parents ){
         _parents.emplace_back( parent.lock() );
-    } 
+    }
     return _parents;
 }
 
@@ -98,8 +98,8 @@ long var::getUseCount() const{
 bool var::operator==(const var& rhs) const{ return pimpl.get() == rhs.pimpl.get(); }
 
 /* et::var::impl funcs: */
-var::impl::impl(const MatrixXd& _val) : 
-    val(_val), 
+var::impl::impl(const MatrixXd& _val) :
+    val(_val),
     op(op_type::none){}
 
 var::impl::impl(op_type _op, const std::vector<var>& _children)

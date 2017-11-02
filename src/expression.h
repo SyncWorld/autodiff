@@ -15,7 +15,7 @@ namespace et{
  * - find the leaves of the expression tree
  * - TODO: premature optimization of the expression tree.
  *      - i.e.: x + x + x + x => 3*x
- * 
+ *
  * We will use the expression class inside of:
  * - et::eval()
  * - et::back()
@@ -39,7 +39,7 @@ public:
     // Recursively evaluates the tree.
     // This may have memory issues if the stack size is significant.
     MatrixXd propagate();
-    
+
     // Uses the given leaves, possibly from findSource(),
     // and performs a bottom-up evaluation of the tree
     // from the leaves.
@@ -57,7 +57,7 @@ public:
     // We compute one in the prev. def, and we can plug it into the new function so that
     // the nonconst computation isn't done again.
     void backpropagate(std::unordered_map<var, MatrixXd>& leaves, const std::unordered_set<var>& nonconsts);
-    
+
 private:
     var root;
 };

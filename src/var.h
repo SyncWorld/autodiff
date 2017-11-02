@@ -68,7 +68,7 @@ struct noisy
 };
 
 
-/** 
+/**
  * ::Example 2::
  *
  * et::var x(10);
@@ -84,7 +84,7 @@ struct noisy
  * z.children.size(); // outputs 2. We will not implement path compression.
  * eval(z); // z's original value is overwritte; outputs 30
  *
- * y.val; // outputs 20. It's already evaluated by eval(z)! 
+ * y.val; // outputs 20. It's already evaluated by eval(z)!
  */
 
 class var {
@@ -103,22 +103,22 @@ public:
     // movable
     var(var&&) noexcept;
     var& operator=(var&&) noexcept;
-    
+
     // shallow copyable
     var(const var&);
     var& operator=(const var&);
 
     // deep copyable
     var clone();
-    
+
     // Access/Modify the current node value
     MatrixXd getValue() const;
     void setValue(const MatrixXd&);
     op_type getOp() const;
     void setOp(op_type);
-    
+
     // Access internals (no modify)
-    
+
     // We return by reference because we do not
     // want to increase the shared_ptr count.
     // (Even though it's innocuous so far)
@@ -140,7 +140,7 @@ public:
     // using functions. We shouldn't be using friends often.
     template <typename... V>
     friend const var pack_expression(op_type, V&...);
-private: 
+private:
     // PImpl idiom requires forward declaration of the class:
     std::shared_ptr<impl> pimpl;
 };
@@ -161,9 +161,9 @@ public:
     // The operator associated with this variable.
     // For example, `z = x + y` will have z contain
     // an op value of var::op::plus
-    op_type op; 
+    op_type op;
 
-    // The children of the current variable, 
+    // The children of the current variable,
     // i.e. which variables make up this variable.
     std::vector<var> children;
 
@@ -179,7 +179,7 @@ const var pack_expression(op_type op, V&... args){
     std::vector<std::shared_ptr<var::impl> > vimpl = { args.pimpl... };
     std::vector<var> v;
     for(const std::shared_ptr<var::impl>& _impl : vimpl){
-        v.emplace_back(_impl); 
+        v.emplace_back(_impl);
     }
     var res(op, v);
     for(const std::shared_ptr<var::impl>& _impl : vimpl){
